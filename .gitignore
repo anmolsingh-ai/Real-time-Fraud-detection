@@ -1,4 +1,6 @@
 __pycache__/
 *.pkl
 mlruns/
-data/
+data/**
+!data/**/
+!data/**/*.dvc
