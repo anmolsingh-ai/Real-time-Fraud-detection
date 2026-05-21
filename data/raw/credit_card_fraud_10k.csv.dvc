@@ -1,0 +1,5 @@
+outs:
+- md5: 6795d15b74d36631fe3a28665f5c708c
+  size: 360524
+  hash: md5
+  path: credit_card_fraud_10k.csv
