@@ -60,7 +60,7 @@ def main():
 
     joblib.dump(
         preprocessor,
-        os.path.join(os.path.dirname(__file__), "preprocessor.pkl"))
+        os.path.join(os.path.dirname(__file__), "preprocess_scaler.pkl"))
 
     smote = SMOTE(random_state = 42)
 
