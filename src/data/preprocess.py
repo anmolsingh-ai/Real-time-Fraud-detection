@@ -58,9 +58,12 @@ def main():
     print(f"Train_scaled Shape: {X_train_scaled.shape}")
     print(f"Test_scaled Shape: {X_test_scaled.shape}")
 
+    MODEL_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "models"))
+    save_path = os.path.join(MODEL_DIR, "preprocess_scaler.pkl")
+
     joblib.dump(
         preprocessor,
-        os.path.join(os.path.dirname(__file__), "preprocess_scaler.pkl"))
+        save_path)
 
     smote = SMOTE(random_state = 42)
 
