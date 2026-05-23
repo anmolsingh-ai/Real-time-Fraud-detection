@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 from imblearn.over_sampling import SMOTE
 
-RAW_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "raw", "credit_card_fraud_10k.csv"))
+RAW_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "data", "processed", "credit_card_fraud_engineered.csv"))
 RANDOM_STATE = 42
 
 def main():
@@ -88,6 +88,8 @@ def main():
         "data/processed/test.csv",
         index=False
     )
+
+    
 
     print("Preprocessing completed successfully.")
 
