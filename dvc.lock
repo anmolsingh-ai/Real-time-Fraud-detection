@@ -1,0 +1,62 @@
+schema: '2.0'
+stages:
+  feature_engineering:
+    cmd: python src/features/feature_engineering.py
+    deps:
+    - path: data/raw/credit_card_fraud_10k.csv
+      hash: md5
+      md5: 6795d15b74d36631fe3a28665f5c708c
+      size: 360524
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: 3a6115f66ceeef1f46cb6216cffdabd0
+      size: 821
+    outs:
+    - path: data/processed/credit_card_fraud_engineered.csv
+      hash: md5
+      md5: 89f036e234891c3793055dddf9fcb7a2
+      size: 612177
+  preprocess:
+    cmd: python src/data/preprocess.py
+    deps:
+    - path: data/processed/credit_card_fraud_engineered.csv
+      hash: md5
+      md5: 89f036e234891c3793055dddf9fcb7a2
+      size: 612177
+    - path: src/data/preprocess.py
+      hash: md5
+      md5: f874acc90428c38c7364dad9e6bee21f
+      size: 2863
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 761c0f67f1437d9bdd89b23e8687a8ba
+      size: 319544
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0ed7b135a4fe6fad91b1385e109d82c2
+      size: 2729661
+    - path: models/preprocess_scaler.pkl
+      hash: md5
+      md5: 08a0bb21ee3ac20c9c3ef7a38da50e42
+      size: 3634
+  train:
+    cmd: python src/models/train.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 761c0f67f1437d9bdd89b23e8687a8ba
+      size: 319544
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0ed7b135a4fe6fad91b1385e109d82c2
+      size: 2729661
+    - path: src/models/train.py
+      hash: md5
+      md5: 61a465a27128679fbf7d05c563b2f7c1
+      size: 2754
+    outs:
+    - path: models/xgboost_model.pkl
+      hash: md5
+      md5: ae43fe005350cf77d4b9317f63aaf334
+      size: 204372

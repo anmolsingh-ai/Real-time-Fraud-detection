@@ -1,0 +1,6 @@
+[core]
+    remote = myremote
+    autostage = true
+['remote "myremote"']
+    url = s3://fraud-detection-s3-bucket-demo/data-store
+    region = ap-south-1
