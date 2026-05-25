@@ -4,8 +4,9 @@ import joblib
 
 
 def main():
+    df = pd.read_csv(
+    "data/raw/credit_card_fraud_10k.csv")
 
-    df = pd.read_csv(r"E:\fraud-detection\fraud-detection\data\raw\credit_card_fraud_10k.csv")
     
     df["is_night_transaction"] = df["transaction_hour"].apply(
         lambda x: 1 if x >= 22 or x <= 5 else 0
