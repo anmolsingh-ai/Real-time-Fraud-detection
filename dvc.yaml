@@ -29,3 +29,13 @@ stages:
     outs:
       - models/xgboost_model.pkl
 
+  anomaly_detection:
+    cmd: python src/models/anomly_detection.py  
+    deps:
+      - src/models/anomly_detection.py
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - models/xgboost_model.pkl
+    outs:
+      - models/isolation_forest.pkl
+
