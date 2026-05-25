@@ -38,7 +38,7 @@ jobs:
         run: python src/features/feature_engineering.py
 
       - name: Run Preprocessing Pipeline
-        run: python src/data/preprocessing_pipeline.py
+        run: python src/data/preproces.py
 
       - name: Train XGBoost Model
         run: python src/models/train.py
