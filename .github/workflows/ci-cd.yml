@@ -35,7 +35,7 @@ jobs:
         run: dvc pull 
 
       - name: Run Feature engineering
-        run: python src/features/featur_engineering.py
+        run: python src/features/feature_engineering.py
 
       - name: Run Preprocessing Pipeline
         run: python src/data/preprocessing_pipeline.py
