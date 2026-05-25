@@ -54,13 +54,11 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build \
-            -t ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest .
 
       - name: Push Docker Image
         run: |
-          docker push \
-            ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest
 
       - name: Login to Amazon ECR
         id: login-ecr
