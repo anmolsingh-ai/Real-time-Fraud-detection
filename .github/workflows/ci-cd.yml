@@ -4,114 +4,147 @@ on:
   push:
     branches:
       - main
+
   pull_request:
     branches:
       - main
 
+
 jobs:
+
   train:
+
     runs-on: ubuntu-latest
+
     outputs:
       models_artifact: models-artifact
+
+
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
+
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install Dependencies
+
         run: |
+
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Install DVC with S3 support
-        run: pip install "dvc[s3]"
+          pip install -r requirements.txt
 
-      - name: Configure AWS credentials
+          pip install "dvc[s3]"
+
+
+      - name: Configure AWS Credentials
+
         uses: aws-actions/configure-aws-credentials@v4
+
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Pull DVC data
-        run: dvc pull 
-
-      - name: Run Feature engineering
+      - name: Pull DVC Data
+        run: dvc pull
+      - name: Run Feature Engineering
         run: python src/features/feature_engineering.py
 
       - name: Run Preprocessing Pipeline
         run: python src/data/preprocess.py
 
+
       - name: Train XGBoost Model
         run: python src/models/train.py
-
       - name: Run Anomaly Detection
         run: python src/models/anomly_detection.py
 
-      - name: Upload models
+      - name: Upload Models Artifact
         uses: actions/upload-artifact@v4
+
         with:
           name: models-artifact
           path: models/
 
   build-and-deploy:
+
     needs: train
     runs-on: ubuntu-latest
+
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download models artifact
+      - name: Download Models Artifact
         uses: actions/download-artifact@v4
+
         with:
           name: models-artifact
-          path: models
-
-      - name: Validate Docker credentials
-        run: |
-          if [ -z "${{ secrets.DOCKER_USERNAME }}" ] || [ -z "${{ secrets.DOCKER_PASSWORD }}" ]; then
-            echo "ERROR: DOCKER_USERNAME and DOCKER_PASSWORD secrets must be set"
-            exit 1
-          fi
+          path: models/
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
+
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest
-          platforms: linux/amd64
-          load: false
+      - name: Build Docker Image
 
-      - name: Configure AWS credentials
+        run: |
+
+          docker build \
+          -t ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest .
+
+
+      - name: Push Docker Image
+
+        run: |
+
+          docker push \
+          ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest
+
+
+      - name: Configure AWS Credentials
+
         uses: aws-actions/configure-aws-credentials@v4
+
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+
       - name: Login to Amazon ECR
+
         id: login-ecr
+
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Tag and Push Docker Image to ECR
+
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: fraud-detection-api
           IMAGE_TAG: latest
+
         run: |
-          docker tag ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+          docker tag \
+          ${{ secrets.DOCKER_USERNAME }}/fraud-detection-api:latest \
+          $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+          docker push \
+          $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
 
       - name: Pipeline Completed
+
         run: echo "CI/CD pipeline completed successfully."
